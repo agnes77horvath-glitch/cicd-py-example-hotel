@@ -2,17 +2,25 @@ import time
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
 import allure
 import pytest
 
+URL = 'http://hotel-v3.progmasters.hu/'
 
 class TestHootel(object):
     def setup_method(self):
-        URL = 'http://hotel-v3.progmasters.hu/'
         options = Options()
         options.add_experimental_option("detach", True)
+        options.add_argument("--headless")
         self.browser = webdriver.Chrome(options=options)
         self.browser.get(URL)
+        self.browser.maximize_window()
+        print(self.browser.get_window_size())
+        self.browser.fullscreen_window()
+        print(self.browser.get_window_size()) # írja ki, hogy mekkora a böngésző mérete
+        self.browser.set_window_size(1024, 768)# beállítom az ablak méretét
 
     def teardown_method(self):
         self.browser.quit()
@@ -22,7 +30,8 @@ class TestHootel(object):
     @allure.severity(allure.severity_level.TRIVIAL)
     @allure.tag("login")
     def test_login(self):
-        login_btn = self.browser.find_element(By.XPATH, '//a[@class="nav-link"]')
+        #login_btn = self.browser.find_element(By.XPATH, '//a[@class="nav-link"]')
+        login_btn = WebDriverWait(self.browser, 5).until(EC.element_to_be_clickable(By.XPATH, '//a[@class="nav-link"]'))
         login_btn.click()
 
         email_input = self.browser.find_element(By.ID, 'email')
